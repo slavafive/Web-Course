@@ -1,0 +1,50 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 50vw;
+    height: 50vh;
+    overflow: scroll;
+}
+
+.container .top {
+    width: 100%;
+    height: 20%;
+    background-color: #0073ff;
+}
+
+.container .bottom {
+    width: 100%;
+    height: 80%;
+    background-color: #ff2f82;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: scroll;
+}
+
+.container .bottom ul {
+    width: 80%;
+    padding: 0;
+    list-style-type: none;
+}
+
+.container .bottom ul li {
+    margin: 5px 0;
+    background-color: greenyellow;
+}
+
+div {
+    border: 2px solid black;
+}
+
+/*.container {*/
+/*    position: relative;*/
+/*}*/
+
+/*.container ul {*/
+/*    position: absolute;*/
+/*    left: 50%;*/
+/*    transform: translatex(-50%);*/
+/*}*/
