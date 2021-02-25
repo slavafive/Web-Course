@@ -111,21 +111,6 @@ body {
     padding: 0;
 }
 
-@media all and (min-width: 800px) {
-    .header-city, .header-information, .favourites, .favourites-add-city, .city {
-        flex: 1;
-    }
-    .header-information {
-        flex: 1;
-    }
-    .favourites {
-        flex: 1;
-    }
-    .favourites-add-city {
-        flex: 1;
-    }
-}
-
 /* header */
 
 h1 {
@@ -165,12 +150,22 @@ button {
     font-family: inherit;
 }
 
-.refresh {
+.refresh-big {
     color: #fff;
     background-color: var(--button-color);
     padding: 8px 30px;
     font-size: 20px;
-    border-radius: 10px;
+    border-radius: 5px;
+}
+
+.refresh-small {
+    background-color: var(--button-color);
+    padding: 8px;
+}
+
+.refresh-small img {
+    width: 50px;
+    height: 50px;
 }
 
 .round {
@@ -194,6 +189,7 @@ button {
 }
 
 /* ul li */
+
 ul {
     list-style-type: none;
     padding: 0;
@@ -224,4 +220,23 @@ ul li > span:nth-child(1) {
 
 .temperature-city-information {
     font-size: 25px;
+}
+
+@media all and (min-width: 600px) {
+
+    .header-city, .header-information, .favourites, .favourites-add-city, .city {
+        flex: 1;
+    }
+
+    .refresh-small {
+        display: none;
+    }
+}
+
+@media all and (max-width: 600px) {
+
+    .refresh-big {
+        display: none;
+    }
+
 }
