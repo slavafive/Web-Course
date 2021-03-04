@@ -28,21 +28,22 @@ div, header {
     text-align: center;
 }
 
-.wrapper > * {
+.header, .header-city, .header-information, .break, .favourites, .favourites-add-city, .city, .city-information {
     flex: 1 100%;
 }
 
-.header-city, .header-information, .favourites, .favourites-add-city, .city, .city-information, ul {
+.header-city, .header-information, .favourites, .favourites-add-city, .city, .city-list, .city-information, .city-information-list {
     min-width: 400px;
 }
 
 .header {
-    background-color: #ffffff;
-    height: 50px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    background-color: #ffffff;
+    height: 50px;
+    padding: 0 10px;
 }
 
 .header-city {
@@ -50,6 +51,7 @@ div, header {
     height: 300px;
 
     text-align: left;
+    padding-left: 10px;
 }
 
 .header-city-child {
@@ -60,30 +62,33 @@ div, header {
 }
 
 .header-information {
-    background-color: #ffffff;
-    height: 300px;
-
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: #ffffff;
+    height: 300px;
+    padding-right: 10px;
 }
 
 .favourites {
-    background-color: #ffffff;
-    height: 60px;
-
     display: flex;
     justify-content: flex-start;
     align-items: center;
+
+    background-color: #ffffff;
+    height: 60px;
+    padding-left: 10px;
 }
 
 .favourites-add-city {
-    background-color: #ffffff;
-    height: 60px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    background-color: #ffffff;
+    height: 60px;
+    padding-right: 10px;
 }
 
 .city {
@@ -192,6 +197,29 @@ button {
 
 /* ul li */
 
+.city-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    list-style-type: none;
+    padding: 0;
+    margin: 10px;
+}
+
+.city-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #ffffff;
+    height: 300px;
+    margin-top: 50px;
+    padding: 0 10px;
+    flex: 1 50%;
+}
+
 .city-information-list {
     list-style-type: none;
     padding: 0;
@@ -239,10 +267,6 @@ ul li > span:nth-child(1) {
 
     .refresh-big {
         display: none;
-    }
-
-    .favourites {
-        min-width: 1000px;
     }
 
 }
