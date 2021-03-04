@@ -16,6 +16,10 @@ body {
     font-family: Comfortaa;
 }
 
+div, header {
+    margin: 10px;
+}
+
 /* div */
 
 .wrapper {
@@ -25,14 +29,11 @@ body {
 }
 
 .wrapper > * {
-    padding: 10px;
-    margin: 10px;
     flex: 1 100%;
-    border-radius: 30px;
 }
 
-.city {
-    margin-top: 50px;
+.header-city, .header-information, .favourites, .favourites-add-city, .city, .city-information, ul {
+    min-width: 400px;
 }
 
 .header {
@@ -88,6 +89,7 @@ body {
 .city {
     background-color: #ffffff;
     height: 300px;
+    margin-top: 50px;
 
     display: flex;
     flex-direction: column;
@@ -190,13 +192,13 @@ button {
 
 /* ul li */
 
-ul {
+.city-information-list {
     list-style-type: none;
     padding: 0;
     width: 100%;
 }
 
-ul li {
+.city-information-list li {
     background: linear-gradient(to right, var(--first-color), var(--second-color));
     color: white;
     padding: 8px;
@@ -222,7 +224,7 @@ ul li > span:nth-child(1) {
     font-size: 25px;
 }
 
-@media all and (min-width: 600px) {
+@media all and (min-width: 900px) {
 
     .header-city, .header-information, .favourites, .favourites-add-city, .city {
         flex: 1;
@@ -233,10 +235,14 @@ ul li > span:nth-child(1) {
     }
 }
 
-@media all and (max-width: 600px) {
+@media all and (max-width: 900px) {
 
     .refresh-big {
         display: none;
+    }
+
+    .favourites {
+        min-width: 1000px;
     }
 
 }
