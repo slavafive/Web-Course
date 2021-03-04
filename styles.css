@@ -22,7 +22,7 @@ div, header {
 
 /* div */
 
-.wrapper {
+.main {
     display: flex;
     flex-flow: row wrap;
     text-align: center;
@@ -32,7 +32,7 @@ div, header {
     flex: 1 100%;
 }
 
-.header-city, .header-information, .favourites, .favourites-add-city, .city, .city-list, .city-information, .city-information-list {
+.header-city, .header-information, .favourites, .favourites-add-city, .city, .city-list, .city-information, .city-information-list, .city-item {
     min-width: 400px;
 }
 
