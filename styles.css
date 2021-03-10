@@ -33,7 +33,7 @@ div, header {
 }
 
 .header-city, .header-information, .favourites, .favourites-add-city, .city, .city-list, .city-information, .city-information-list, .city-item {
-    min-width: 400px;
+    min-width: 280px;
 }
 
 .header {
@@ -78,7 +78,6 @@ div, header {
 
     background-color: #ffffff;
     height: 60px;
-    padding-left: 10px;
 }
 
 .favourites-add-city {
@@ -231,7 +230,7 @@ button {
     color: white;
     padding: 8px;
     margin: 3px;
-    font-size: 20px;
+    font-size: 16px;
     border-radius: 5px;
 
     display: flex;
