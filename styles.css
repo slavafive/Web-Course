@@ -244,7 +244,7 @@ ul li > span:nth-child(1) {
 }
 
 .temperature-header-city {
-    font-size: 110px;
+    font-size: 90px;
 }
 
 .temperature-city-information {
@@ -268,4 +268,16 @@ ul li > span:nth-child(1) {
         display: none;
     }
 
+}
+
+@media all and (max-width: 400px) {
+    .temperature-header-city {
+        font-size: 40px;
+    }
+
+    .img-header-city {
+        width: 90px;
+        height: 90px;
+        float: left;
+    }
 }
