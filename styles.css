@@ -16,10 +16,6 @@ body {
     font-family: Comfortaa;
 }
 
-div, header {
-    margin: 10px;
-}
-
 /* div */
 
 .main {
@@ -42,8 +38,7 @@ div, header {
     align-items: center;
 
     background-color: #ffffff;
-    height: 50px;
-    padding: 0 10px;
+    height: 70px;
 }
 
 .header-city {
@@ -51,7 +46,6 @@ div, header {
     height: 300px;
 
     text-align: left;
-    padding-left: 10px;
 }
 
 .header-city-child {
@@ -68,12 +62,11 @@ div, header {
 
     background-color: #ffffff;
     height: 300px;
-    padding-right: 10px;
 }
 
 .favourites {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
 
     background-color: #ffffff;
@@ -87,7 +80,7 @@ div, header {
 
     background-color: #ffffff;
     height: 60px;
-    padding-right: 10px;
+    margin: 0px;
 }
 
 .city {
@@ -128,18 +121,14 @@ h2 {
 }
 
 h3 {
-    font-size: 25px;
-}
-
-h4 {
-    font-size: 25px;
+    font-size: 21px;
 }
 
 /* img */
 
 .img-header-city {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     float: left;
 }
 
@@ -170,8 +159,9 @@ button {
 }
 
 .refresh-small img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
 }
 
 .round {
@@ -180,13 +170,13 @@ button {
     font-size: 20px;
     width: 50px;
     height: 50px;
-    margin-left: 20px;
 }
 
 /* input */
 
 .add-new-city {
-    width: 300px;
+    width: 180px;
+    margin-right: 20px;
     font-size: 20px;
     border-radius: 5px;
     font-family: inherit;
@@ -203,7 +193,7 @@ button {
 
     list-style-type: none;
     padding: 0;
-    margin: 10px;
+    margin: 0;
 }
 
 .city-item {
@@ -215,7 +205,6 @@ button {
     background-color: #ffffff;
     height: 300px;
     margin-top: 50px;
-    padding: 0 10px;
     flex: 1 50%;
 }
 
@@ -229,7 +218,7 @@ button {
     background: linear-gradient(to right, var(--first-color), var(--second-color));
     color: white;
     padding: 8px;
-    margin: 3px;
+    margin: 2px;
     font-size: 16px;
     border-radius: 5px;
 
@@ -248,10 +237,10 @@ ul li > span:nth-child(1) {
 }
 
 .temperature-city-information {
-    font-size: 25px;
+    font-size: 21px;
 }
 
-@media all and (min-width: 900px) {
+@media all and (min-width: 1200px) {
 
     .header-city, .header-information, .favourites, .favourites-add-city, .city {
         flex: 1;
@@ -260,9 +249,13 @@ ul li > span:nth-child(1) {
     .refresh-small {
         display: none;
     }
+
+    .city-information-list li {
+        margin: 5px;
+    }
 }
 
-@media all and (max-width: 900px) {
+@media all and (max-width: 1200px) {
 
     .refresh-big {
         display: none;
@@ -272,7 +265,7 @@ ul li > span:nth-child(1) {
 
 @media all and (max-width: 400px) {
     .temperature-header-city {
-        font-size: 40px;
+        font-size: 50px;
     }
 
     .img-header-city {
@@ -280,4 +273,27 @@ ul li > span:nth-child(1) {
         height: 90px;
         float: left;
     }
+
+    .city-information li {
+        font-size: 14px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    .temperature-city-information {
+        font-size: 20px;
+    }
+
+    .img-city-weather {
+        width: 45px;
+        height: 45px;
+    }
+
+    .round {
+        width: 40px;
+        height: 40px;
+    }
+
 }
