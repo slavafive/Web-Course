@@ -41,13 +41,13 @@
     </div>
 
     <div class="favourites-add-city">
-        <input type="text" placeholder="Add new city" class="add-new-city">
-        <button type="submit" class="round">+</button>
+        <input type="text" placeholder="Add new city" class="add-new-city" id="add-new-city">
+        <button type="submit" class="round" id="add-city" onclick="addItem()">+</button>
     </div>
 
     <div class="break"></div>
 
-    <ul class="city-list">
+    <ul class="city-list" id="city-list">
     <li class="city-item">
         <div class="city-information">
             <h3>Paris</h3>
@@ -149,6 +149,8 @@
     </main>
 
 </div>
+
+<script src="js/script.js"></script>
 
 </body>
 </html>
