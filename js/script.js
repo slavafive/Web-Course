@@ -3,26 +3,42 @@ apiKey = 'c1fba4b3fbec3b5f92b79c28980e8024';
 localStorage.clear();
 
 function refresh() {
-    let cities = []
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        cities.push(key);
-    }
+    removeAllCities();
     localStorage.clear();
-    for (let i = 0; i < cities.length; i++) {
-        localStorage.setItem(cities[i], 'true');
-        addCity(cities[i]);
-    }
 }
 
 function enterCity() {
     let cityName = document.getElementById('add-new-city').value;
-
     if (localStorage.getItem(cityName) != null) {
         return;
     }
-
     addCity(cityName);
+}
+
+function capitalize(str) {
+    return str.replace(/^\w/, (c) => c.toUpperCase());
+}
+
+function getImageNameByOvercast(overcast) {
+    switch (overcast) {
+        case 'Few clouds':
+            return 'sunny-cloudy.png';
+        case 'Clear sky':
+        case 'Sunny':
+            return 'sunny.png';
+        case 'Rain':
+            return 'rain.png';
+        case 'Light snow':
+        case 'Snow':
+        case 'Heavy snow':
+            return 'snow.png';
+        default:
+            return 'cloudy.png';
+    }
+}
+
+function updateCity() {
+
 }
 
 function addCity(cityName) {
@@ -32,16 +48,15 @@ function addCity(cityName) {
 
     let p = document.createElement('p');
     p.classList.add('temperature-city-information');
-    p.textContent = '30\xB0C';
 
     let img = document.createElement('img');
-    img.src = 'images/cloudy.png';
     img.classList.add('img-city-weather');
 
     let button = document.createElement('button');
     button.type = 'submit';
     button.classList.add('round');
     button.textContent = 'x';
+    button.addEventListener('click', removeCity);
 
     let div = document.createElement('div')
     div.classList.add('city-information');
@@ -54,38 +69,42 @@ function addCity(cityName) {
     let ulChild = document.createElement('ul');
     ulChild.classList.add('city-information-list');
 
-    let weatherConditions = {
-        'Wind': 'Moderate breeze, 6.0 m/s',
-        'Overcast': 'Broken clouds',
-        'Pressure': '1013 hpa',
-        'Humidity': '52 %',
-        'Coordinates': '[59.88, 30.42]'
-    }
+    fetch('https://api.openweathermap.org/data/2.5/weather?q=' + cityName + '&appid=' + apiKey)
+        .then(response => response.json())
+        .then(data => {
 
-    // let weatherConditions = getWeather(cityName);
-    try {
-        let a = getWeather(cityName);
-        console.log(weatherConditions);
-    } catch(error) {
-        console.log(error);
-        return;
-    }
+            console.log(data);
 
-    for (let key in weatherConditions) {
-        let value = weatherConditions[key];
+            let overcast = capitalize(data['weather'][0]['description']);
+            img.src = 'images/' + getImageNameByOvercast(overcast);
 
-        let leftSpan = document.createElement('span');
-        leftSpan.textContent = key;
+            p.textContent = (Math.round(data['main']['temp']) - 273).toString() + '\xB0C';
 
-        let rightSpan = document.createElement('span');
-        rightSpan.textContent = value;
+            let weatherConditions = {
+                'Wind speed': data['wind']['speed'] + ' m/s',
+                'Overcast': overcast,
+                'Pressure': data['main']['pressure'] + ' hpa',
+                'Humidity': data['main']['humidity'] + ' %',
+                'Coordinates': '[' + parseFloat(data['coord']['lat']).toFixed(2) + ', ' + parseFloat(data['coord']['lon']).toFixed(2) + ']'
+            };
 
-        let item = document.createElement('li');
-        item.appendChild(leftSpan);
-        item.appendChild(rightSpan);
+            for (let key in weatherConditions) {
+                let value = weatherConditions[key];
 
-        ulChild.appendChild(item);
-    }
+                let leftSpan = document.createElement('span');
+                leftSpan.textContent = key;
+
+                let rightSpan = document.createElement('span');
+                rightSpan.textContent = value;
+
+                let item = document.createElement('li');
+                item.appendChild(leftSpan);
+                item.appendChild(rightSpan);
+
+                ulChild.appendChild(item);
+
+        }})
+        .catch(err => alert('Wrong city name!'));
 
     let li = document.createElement('li');
     li.classList.add('city-item');
@@ -98,23 +117,32 @@ function addCity(cityName) {
     localStorage.setItem(cityName, 'true');
 }
 
-function removeCity() {
+function removeCity(event) {
+    let cityName = event.target.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
+    localStorage.removeItem(cityName);
+    event.target.parentElement.parentElement.remove();
+}
 
+function refreshCity(cityName) {
+    let ul = document.getElementById('city-list');
+    let child = ul.firstElementChild;
+    while (child) {
+        let currentCityName = child.firstElementChild.firstElementChild.textContent;
+        if (cityName == currentCityName) {
+            child.firstElementChild.children[1].textContent = '50\xB0C';
+            return;
+        }
+        child = child.nextElementSibling;
+    }
+}
+
+function removeAllCities() {
+    let ul = document.getElementById('city-list');
+    let child = ul.lastElementChild;
+    while (child) {
+        ul.removeChild(child);
+        child = ul.lastElementChild;
+    }
 }
 
 // document.getElementById('refresh').addEventListener('click', getWeather);
-
-function getWeather(city) {
-    fetch('https://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + apiKey)
-        .then(response => response.json())
-        .then(data => {
-            let dict = {
-                'latitude': data['coord']['lat'],
-                'longitude': data['coord']['lon'],
-                'windSpeed': data['wind']['speed'],
-                'description': data['weather'][0]['description']
-            };
-            return 5;
-        })
-        .catch(err => alert('Wrong city name!'));
-}
