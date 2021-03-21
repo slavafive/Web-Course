@@ -11,8 +11,8 @@
 
     <header class="header">
         <h1>Weather</h1>
-        <button type="submit" class="refresh-big">Refresh geolocation</button>
-        <button type="submit" class="refresh-small"><img src="images/refresh.png"></button>
+        <button type="submit" class="refresh-big" onclick="refresh()">Refresh geolocation</button>
+        <button type="submit" class="refresh-small" onclick="refresh()"><img src="images/refresh.png"></button>
     </header>
 
     <main class="main">
@@ -42,108 +42,12 @@
 
     <div class="favourites-add-city">
         <input type="text" placeholder="Add new city" class="add-new-city" id="add-new-city">
-        <button type="submit" class="round" id="add-city" onclick="addItem()">+</button>
+        <button type="submit" class="round" id="add-city" onclick="enterCity()">+</button>
     </div>
 
     <div class="break"></div>
 
     <ul class="city-list" id="city-list">
-    <li class="city-item">
-        <div class="city-information">
-            <h3>Paris</h3>
-            <p class="temperature-city-information">18&#176;C</p>
-            <img src="images/cloudy.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-    </li>
-
-    <li class="city-item">
-        <div class="city-information">
-            <h3>Moscow</h3>
-            <p class="temperature-city-information">25&#176;C</p>
-            <img src="images/sunny.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-    </li>
-
-    <li class="city-item">
-        <div class="city-information">
-            <h3>Nice</h3>
-            <p class="temperature-city-information">6&#176;C</p>
-            <img src="images/snow.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-
-    </li>
-
-    <li class="city-item">
-        <div class="city-information">
-            <h3>London</h3>
-            <p class="temperature-city-information">13&#176;C</p>
-            <img src="images/sunny-cloudy.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-    </li>
-
-    <li class="city-item">
-        <div class="city-information">
-            <h3>Milan</h3>
-            <p class="temperature-city-information">20&#176;C</p>
-            <img src="images/sunny.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-    </li>
-
-    <li class="city-item">
-        <div class="city-information">
-            <h3>Lyon</h3>
-            <p class="temperature-city-information">16&#176;C</p>
-            <img src="images/cloudy.png" class="img-city-weather">
-            <button type="submit" class="round">x</button>
-        </div>
-        <ul class="city-information-list">
-            <li><span>Wind</span><span>Moderate breeze, 6.0 m/s</span></li>
-            <li><span>Overcast</span><span>Broken clouds</span></li>
-            <li><span>Pressure</span><span>1013 hpa</span></li>
-            <li><span>Humidity</span><span>52 %</span></li>
-            <li><span>Coordinates</span><span>[59.88, 30.42]</span></li>
-        </ul>
-    </li>
 
     </ul>
     </main>
