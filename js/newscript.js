@@ -1,5 +1,6 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
+localStorage.clear()
 getCurrentGeoposition()
 uploadCities()
 
@@ -18,6 +19,7 @@ function uploadCities() {
 // geoposition
 // -------------------------------------------------------------------------
 function getCurrentGeoposition() {
+    showMainLoader()
     let geolocation = navigator.geolocation;
     geolocation.getCurrentPosition(getCurrentLocation, geolocationError)
 }
@@ -81,8 +83,9 @@ function handleErrors(response) {
 // -------------------------------------------------------------------------
 function parseWeatherConditions(data) {
     let overcast = capitalize(data['weather'][0]['description']);
+    console.log(data)
     return {
-        'City': 'Saint Petersburg',
+        'City': data['name'],
         'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
         'Image': 'images/' + getImageNameByOvercast(overcast),
         'Wind speed': data['wind']['speed'] + ' m/s',
@@ -129,10 +132,9 @@ function enterCity() {
 }
 
 function addCity(cityName) {
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey})`
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
             let li = createCity(data)
-            hideLoader(li) // эта функция почему-то не убирает loader
         }
     )
 }
@@ -211,6 +213,7 @@ function removeCity(event) {
 // -------------------------------------------------------------------------
 function showWeatherForMainCity(data) {
     let div = document.getElementById('header-city')
+
     let h2 = div.firstElementChild
     let divChild = div.lastElementChild
     let img = divChild.firstElementChild
@@ -220,8 +223,17 @@ function showWeatherForMainCity(data) {
     h2.textContent = data['City']
     img.src = data['Image']
     p.textContent = data['Temperature']
+    //
+    // divChild.append(img)
+    // divChild.append(p)
+    // divChild.append(ul)
+    //
+    // div.append(h2)
+    // div.append(divChild)
 
     fillCard(ul, data)
+
+    hideMainLoader()
 }
 
 function fillCard(ul, data) {
@@ -237,6 +249,18 @@ function fillCard(ul, data) {
 
 // loader
 // -------------------------------------------------------------------------
+function showMainLoader() {
+    document.getElementById('header-city').hidden = true
+    document.getElementById('header-loader').hidden = false
+    document.getElementById('main-city-information-list').hidden = true
+}
+
+function hideMainLoader() {
+    document.getElementById('header-city').hidden = false
+    document.getElementById('header-loader').hidden = true
+    document.getElementById('main-city-information-list').hidden = false
+}
+
 function createLoader() {
     let loader = document.createElement('div')
     loader.classList.add('loader')
@@ -248,8 +272,8 @@ function showLoader(li) {
     let loader = div.nextElementSibling
     let ul = loader.nextElementSibling
 
-    div.children[1].getElementsByTagName('p')[0].hidden = true
-    div.children[2].getElementsByTagName('img')[0].hidden = true
+    div.getElementsByTagName('p')[0].hidden = true
+    div.getElementsByTagName('img')[0].hidden = true
 
     li.getElementsByClassName('loader')[0].hidden = false
     li.getElementsByTagName('ul')[0].hidden = true
