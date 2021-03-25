@@ -133,8 +133,10 @@ function enterCity() {
 
 function addCity(cityName) {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
+    // createLoader()
     getCityWeather(url, function(data) {
             let li = createCity(data)
+            hideLoader(li)
         }
     )
 }
@@ -187,12 +189,9 @@ function createCity(data) {
     let li = document.createElement('li');
     li.classList.add('city-item');
     li.appendChild(div);
-    let loader = createLoader() // создаю лоадер
+    let loader = createLoader()
     li.appendChild(loader)
     li.appendChild(ulChild)
-
-    // showLoader(li)
-    // hideLoader(li)
 
     let ul = document.getElementById('city-list');
     ul.appendChild(li);
@@ -268,15 +267,27 @@ function createLoader() {
 }
 
 function showLoader(li) {
-    let div = li.firstElementChild
-    let loader = div.nextElementSibling
-    let ul = loader.nextElementSibling
+    let div = li.getElementsByClassName('city-information')[0]
+    let loader = li.getElementsByClassName('loader')[0]
+    let ul = li.getElementsByClassName('city-information-list')[0]
 
     div.getElementsByTagName('p')[0].hidden = true
     div.getElementsByTagName('img')[0].hidden = true
+    ul.hidden = true
 
-    li.getElementsByClassName('loader')[0].hidden = false
-    li.getElementsByTagName('ul')[0].hidden = true
+    loader.hidden = false
+}
+
+function hideLoader(li) {
+    let div = li.getElementsByClassName('city-information')[0]
+    let loader = li.getElementsByClassName('loader')[0]
+    let ul = li.getElementsByClassName('city-information-list')[0]
+
+    div.getElementsByTagName('p')[0].hidden = false
+    div.getElementsByTagName('img')[0].hidden = false
+    ul.hidden = false
+
+    loader.hidden = true
 }
 
 function getListElementByCityName(cityName) {
@@ -290,16 +301,4 @@ function getListElementByCityName(cityName) {
         child = child.nextElementSibling;
     }
     return null;
-}
-
-function hideLoader(li) {
-    let div = li.firstElementChild
-    let loader = div.nextElementSibling
-    let ul = loader.nextElementSibling
-
-    div.getElementsByTagName('p')[0].hidden = false
-    div.getElementsByTagName('img')[0].hidden = false
-
-    li.getElementsByClassName('loader')[0].hidden = true
-    li.getElementsByTagName('ul')[0].hidden = false
 }

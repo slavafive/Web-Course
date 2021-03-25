@@ -313,6 +313,12 @@ ul li > span:nth-child(1) {
     animation: spin 2s linear infinite;
 }
 
+.main-loader {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
