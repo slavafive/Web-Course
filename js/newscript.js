@@ -1,0 +1,281 @@
+apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
+
+getCurrentGeoposition()
+uploadCities()
+
+
+// upload
+// -------------------------------------------------------------------------
+function uploadCities() {
+    for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+            addCity(key);
+        }
+    }
+}
+
+
+// geoposition
+// -------------------------------------------------------------------------
+function getCurrentGeoposition() {
+    let geolocation = navigator.geolocation;
+    geolocation.getCurrentPosition(getCurrentLocation, geolocationError)
+}
+
+function getCurrentLocation(position) {
+    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}`
+    getCityWeather(url, function(data) {
+        showWeatherForMainCity(data)
+    })
+}
+
+function geolocationError(err) {
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey})`
+    getCityWeather(url, function(data) {
+        showWeatherForMainCity(data)
+    })
+}
+
+
+// fetching json
+// -------------------------------------------------------------------------
+function getCityWeather(url, callback) {
+    fetch(url)
+        .then(handleErrors)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            callback(parseWeatherConditions(data)) // showWeatherForMainCity, hideMainLoader
+        })
+        .catch(function(error) {
+            // let parsedWeatherConditions = parseWeatherConditions(data)
+            let parsedWeatherConditions = {
+                'City': 'Paris',
+                'Temperature': '16\xB0C',
+                'Image': 'images/sunny.png',
+                'Wind speed': '7 m/s',
+                'Overcast': 'Broken clouds',
+                'Pressure': '1013 hpa',
+                'Humidity': '70 %',
+                'Coordinates': '[37.88, 92.49]'
+            }
+            callback(parsedWeatherConditions)
+            if (error == 'Not Found') {
+                alert('City was not found')
+            } else {
+                alert(error)
+            }
+        })
+}
+
+function handleErrors(response) {
+    if (!response.ok) {
+        throw response.statusText
+    }
+    return response
+}
+
+
+// parsing
+// -------------------------------------------------------------------------
+function parseWeatherConditions(data) {
+    let overcast = capitalize(data['weather'][0]['description']);
+    return {
+        'City': 'Saint Petersburg',
+        'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
+        'Image': 'images/' + getImageNameByOvercast(overcast),
+        'Wind speed': data['wind']['speed'] + ' m/s',
+        'Overcast': overcast,
+        'Pressure': data['main']['pressure'] + ' hpa',
+        'Humidity': data['main']['humidity'] + ' %',
+        'Coordinates': '[' + parseFloat(data['coord']['lat']).toFixed(2) + ', ' + parseFloat(data['coord']['lon']).toFixed(2) + ']'
+    }
+}
+
+function capitalize(str) {
+    return str.replace(/^\w/, (c) => c.toUpperCase());
+}
+
+function getImageNameByOvercast(overcast) {
+    switch (overcast) {
+        case 'Few clouds':
+            return 'sunny-cloudy.png';
+        case 'Clear sky':
+        case 'Sunny':
+            return 'sunny.png';
+        case 'Rain':
+            return 'rain.png';
+        case 'Light snow':
+        case 'Snow':
+        case 'Heavy snow':
+            return 'snow.png';
+        default:
+            return 'cloudy.png';
+    }
+}
+
+
+// add city
+// -------------------------------------------------------------------------
+function enterCity() {
+    let cityName = document.getElementById('add-new-city').value;
+    if (localStorage.getItem(cityName) == null) {
+        localStorage.setItem(cityName, 'true')
+        addCity(cityName)
+    } else {
+        alert('City ' + cityName + ' was already added to the list')
+    }
+}
+
+function addCity(cityName) {
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey})`
+    getCityWeather(url, function(data) {
+            let li = createCity(data)
+            hideLoader(li) // эта функция почему-то не убирает loader
+        }
+    )
+}
+
+document.getElementById("add-new-city").addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            document.getElementById("add-city").click();
+        }
+    });
+
+function createCity(data) {
+    let h3 = document.createElement('h3');
+    h3.textContent = data['City']
+
+    let p = document.createElement('p');
+    p.classList.add('temperature-city-information');
+    p.textContent = data['Temperature']
+
+    let img = document.createElement('img');
+    img.classList.add('img-city-weather');
+    img.src = data['Image']
+
+    let button = document.createElement('button');
+    button.type = 'submit';
+    button.classList.add('round');
+    button.textContent = 'x';
+    button.addEventListener('click', removeCity);
+
+    let div = document.createElement('div')
+    div.classList.add('city-information');
+
+    div.appendChild(h3);
+    div.appendChild(p);
+    div.appendChild(img);
+    div.appendChild(button);
+
+    let ulChild = document.createElement('ul');
+    ulChild.classList.add('city-information-list');
+
+    for (let i = 0; i < 5; i++) {
+        let li = document.createElement('li');
+        li.appendChild(document.createElement('span'))
+        li.appendChild(document.createElement('span'));
+        ulChild.appendChild(li);
+    }
+
+    fillCard(ulChild, data)
+
+    let li = document.createElement('li');
+    li.classList.add('city-item');
+    li.appendChild(div);
+    let loader = createLoader() // создаю лоадер
+    li.appendChild(loader)
+    li.appendChild(ulChild)
+
+    // showLoader(li)
+    // hideLoader(li)
+
+    let ul = document.getElementById('city-list');
+    ul.appendChild(li);
+
+    return li
+}
+
+// remove city
+// -------------------------------------------------------------------------
+function removeCity(event) {
+    let cityName = event.target.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
+    event.target.parentElement.parentElement.remove();
+    localStorage.removeItem(cityName);
+}
+
+
+// display weather
+// -------------------------------------------------------------------------
+function showWeatherForMainCity(data) {
+    let div = document.getElementById('header-city')
+    let h2 = div.firstElementChild
+    let divChild = div.lastElementChild
+    let img = divChild.firstElementChild
+    let p = divChild.lastElementChild
+    let ul = document.getElementById('main-city-information-list')
+
+    h2.textContent = data['City']
+    img.src = data['Image']
+    p.textContent = data['Temperature']
+
+    fillCard(ul, data)
+}
+
+function fillCard(ul, data) {
+    let keys = ['Wind speed', 'Overcast', 'Pressure', 'Humidity', 'Coordinates']
+    let currentElement = ul.firstElementChild
+    for (let i = 0; i < keys.length; i++) {
+        currentElement.firstElementChild.textContent = keys[i] // first span
+        currentElement.lastElementChild.textContent = data[keys[i]] // second span
+        currentElement = currentElement.nextElementSibling
+    }
+}
+
+
+// loader
+// -------------------------------------------------------------------------
+function createLoader() {
+    let loader = document.createElement('div')
+    loader.classList.add('loader')
+    return loader
+}
+
+function showLoader(li) {
+    let div = li.firstElementChild
+    let loader = div.nextElementSibling
+    let ul = loader.nextElementSibling
+
+    div.children[1].getElementsByTagName('p')[0].hidden = true
+    div.children[2].getElementsByTagName('img')[0].hidden = true
+
+    li.getElementsByClassName('loader')[0].hidden = false
+    li.getElementsByTagName('ul')[0].hidden = true
+}
+
+function getListElementByCityName(cityName) {
+    let ul = document.getElementById('city-list');
+    let child = ul.firstElementChild;
+    while (child) {
+        let currentCityName = child.firstElementChild.firstElementChild.textContent;
+        if (cityName == currentCityName) {
+            return child;
+        }
+        child = child.nextElementSibling;
+    }
+    return null;
+}
+
+function hideLoader(li) {
+    let div = li.firstElementChild
+    let loader = div.nextElementSibling
+    let ul = loader.nextElementSibling
+
+    div.getElementsByTagName('p')[0].hidden = false
+    div.getElementsByTagName('img')[0].hidden = false
+
+    li.getElementsByClassName('loader')[0].hidden = true
+    li.getElementsByTagName('ul')[0].hidden = false
+}

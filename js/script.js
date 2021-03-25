@@ -1,6 +1,96 @@
 apiKey = 'c1fba4b3fbec3b5f92b79c28980e8024';
 
-window.navigator.geolocation.getCurrentPosition(console.log, console.log);
+getGeoposition()
+
+// 1
+function getGeoposition() {
+    var geolocation = navigator.geolocation;
+    geolocation.getCurrentPosition(getCurrentLocation, geolocationError)
+}
+
+// 2
+function getCurrentLocation(position) {
+    const latitude = position.coords.latitude
+    const longitude = position.coords.longitude
+
+    getCityWeather(latitude, longitude, function(data) {
+        showWeatherForMainCity(data)
+        hideMainLoader(true)
+    })
+}
+
+// 3
+function getCityWeather(latitude, longitude, callback) {
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=ru&appid=${apiKey}&units=metric`
+
+    fetch(url)
+        .then(handleErrors)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            const weather = parseWeather(data)
+            callback(weather) // showWeatherForMainCity, hideMainLoader
+        })
+        .catch(function(error) {
+            alert(error)
+        })
+}
+
+function showWeatherForMainCity(weather) {
+    const cityTitle = document.getElementById("currentCityTitle")
+    const cityIcon = document.getElementById("currentCityIcon")
+    const cityWeather = document.getElementById("currentCityWeather")
+
+    cityTitle.textContent = weather.cityTitle
+    cityIcon.src = weather.iconUrl
+    cityWeather.textContent = weather.temperature
+
+    const currCard = document.getElementById("currentCityCard")
+
+    fillCard(currCard, weather)
+}
+
+function handleErrors(response) {
+    if (!response.ok) {
+        throw response.statusText
+    }
+    return response
+}
+
+function hideMainLoader(isHidden) {
+    document.getElementById("mainLoader").hidden = isHidden
+}
+
+function geolocationError(err) {
+    getCityWeatherByName("Санкт-Петербург", function(data) {
+        showWeatherForMainCity(data)
+    })
+}
+
+function parseWeather(data) {
+    console.log(data)
+    const { temp, pressure, humidity } = data.main
+    const place = data.name
+    const { description, icon } = data.weather[0]
+    const wind = data.wind
+
+    const cityTitle = place
+    const iconUrl = `http://openweathermap.org/img/wn/${icon}@2x.png`
+    const temperature = `${temp.toFixed(0)} °C`
+
+
+    const windSpeed = wind.speed + " м/с"
+    const desc = description
+    const press = pressure + " мм рт."
+    const humid = humidity + " %"
+    const coord = "[" + data.coord.lon + ", " + data.coord.lat + "]"
+
+
+    return { cityTitle, iconUrl, temperature, windSpeed, desc, press, humid, coord }
+
+}
 
 document.getElementById("add-new-city")
     .addEventListener("keyup", function(event) {
@@ -10,7 +100,7 @@ document.getElementById("add-new-city")
         }
     });
 
-upload();
+// upload();
 
 function upload() {
     for (let key in localStorage) {
@@ -32,7 +122,6 @@ function refresh() {
 function enterCity() {
     let cityName = document.getElementById('add-new-city').value;
     if (localStorage.getItem(cityName) != null) {
-        console.log(8);
         return;
     }
     addCity(cityName);
