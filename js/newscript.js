@@ -29,7 +29,7 @@ function getCurrentGeoposition() {
 
 function getCurrentLocation(position) {
     let url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}`
-    getCityWeather(url, function(data) {
+    getCityWeather(url, null,function(data) {
         showWeatherForMainCity(data)
     })
 }
@@ -44,7 +44,7 @@ function geolocationError(err) {
 
 // fetching json
 // -------------------------------------------------------------------------
-function getCityWeather(url, callback) {
+function getCityWeather(url, loader, callback) {
     // let ul = document.getElementById('city-list')
     // let i = ul.children.length
     // let li = createLoader()
@@ -58,6 +58,10 @@ function getCityWeather(url, callback) {
             callback(parseWeatherConditions(data)) // showWeatherForMainCity, hideMainLoader
         })
         .catch(function(error) {
+            if (loader != null) {
+                let ul = document.getElementById('city-list')
+                ul.removeChild(loader)
+            }
             if (error == 'Not Found') {
                 alert('City was not found')
             } else {
@@ -130,15 +134,15 @@ function enterCity() {
 }
 
 function addCity(cityName) {
-    localStorage.setItem(cityName, 'true')
     let ul = document.getElementById('city-list')
     let loader = createLoader()
     ul.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    getCityWeather(url, function(data) {
+    getCityWeather(url, loader, function(data) {
             let newLi = createCity(data)
             ul.removeChild(loader)
             ul.appendChild(newLi)
+            localStorage.setItem(cityName, 'true')
             // hideLoader(newLi)
         }
     )
