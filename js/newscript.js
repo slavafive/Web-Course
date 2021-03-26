@@ -14,6 +14,13 @@ function uploadCities() {
 }
 
 
+// refresh
+
+function refresh() {
+    getCurrentGeoposition()
+}
+
+
 // geoposition
 // -------------------------------------------------------------------------
 function getCurrentGeoposition() {
