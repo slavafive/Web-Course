@@ -1,9 +1,7 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
-localStorage.clear()
 getCurrentGeoposition()
 uploadCities()
-
 
 // upload
 // -------------------------------------------------------------------------
@@ -42,6 +40,10 @@ function geolocationError(err) {
 // fetching json
 // -------------------------------------------------------------------------
 function getCityWeather(url, callback) {
+    // let ul = document.getElementById('city-list')
+    // let i = ul.children.length
+    // let li = createLoader()
+    // ul.appendChild(li)
     fetch(url)
         .then(handleErrors)
         .then((response) => {
@@ -51,18 +53,6 @@ function getCityWeather(url, callback) {
             callback(parseWeatherConditions(data)) // showWeatherForMainCity, hideMainLoader
         })
         .catch(function(error) {
-            // let parsedWeatherConditions = parseWeatherConditions(data)
-            let parsedWeatherConditions = {
-                'City': 'Paris',
-                'Temperature': '16\xB0C',
-                'Image': 'images/sunny.png',
-                'Wind speed': '7 m/s',
-                'Overcast': 'Broken clouds',
-                'Pressure': '1013 hpa',
-                'Humidity': '70 %',
-                'Coordinates': '[37.88, 92.49]'
-            }
-            callback(parsedWeatherConditions)
             if (error == 'Not Found') {
                 alert('City was not found')
             } else {
@@ -123,20 +113,25 @@ function getImageNameByOvercast(overcast) {
 // -------------------------------------------------------------------------
 function enterCity() {
     let cityName = document.getElementById('add-new-city').value;
-    if (localStorage.getItem(cityName) == null) {
-        localStorage.setItem(cityName, 'true')
-        addCity(cityName)
-    } else {
-        alert('City ' + cityName + ' was already added to the list')
+    if (!cityName || '' === cityName) {
+        alert('The city name is empty')
+        return
     }
+    if (localStorage.getItem(cityName) != null) {
+        alert('City ' + cityName + ' was already added to the list')
+        return
+    }
+    localStorage.setItem(cityName, 'true')
+    addCity(cityName)
 }
 
 function addCity(cityName) {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    // createLoader()
     getCityWeather(url, function(data) {
-            let li = createCity(data)
-            hideLoader(li)
+            let ul = document.getElementById('city-list')
+            let newLi = createCity(data)
+            ul.appendChild(newLi)
+            // hideLoader(li)
         }
     )
 }
@@ -189,12 +184,12 @@ function createCity(data) {
     let li = document.createElement('li');
     li.classList.add('city-item');
     li.appendChild(div);
-    let loader = createLoader()
-    li.appendChild(loader)
+    // let loader = createLoader()
+    // li.appendChild(loader)
     li.appendChild(ulChild)
 
-    let ul = document.getElementById('city-list');
-    ul.appendChild(li);
+    // let ul = document.getElementById('city-list');
+    // ul.appendChild(li);
 
     return li
 }
