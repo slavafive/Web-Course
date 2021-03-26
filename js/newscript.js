@@ -13,13 +13,11 @@ function uploadCities() {
     }
 }
 
-
 // refresh
-
+// -------------------------------------------------------------------------
 function refresh() {
     getCurrentGeoposition()
 }
-
 
 // geoposition
 // -------------------------------------------------------------------------
@@ -133,12 +131,15 @@ function enterCity() {
 
 function addCity(cityName) {
     localStorage.setItem(cityName, 'true')
+    let ul = document.getElementById('city-list')
+    let loader = createLoader()
+    ul.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
-            let ul = document.getElementById('city-list')
             let newLi = createCity(data)
+            ul.removeChild(loader)
             ul.appendChild(newLi)
-            // hideLoader(li)
+            // hideLoader(newLi)
         }
     )
 }
@@ -191,8 +192,10 @@ function createCity(data) {
     let li = document.createElement('li');
     li.classList.add('city-item');
     li.appendChild(div);
+
     // let loader = createLoader()
     // li.appendChild(loader)
+
     li.appendChild(ulChild)
 
     // let ul = document.getElementById('city-list');
@@ -224,13 +227,6 @@ function showWeatherForMainCity(data) {
     h2.textContent = data['City']
     img.src = data['Image']
     p.textContent = data['Temperature']
-    //
-    // divChild.append(img)
-    // divChild.append(p)
-    // divChild.append(ul)
-    //
-    // div.append(h2)
-    // div.append(divChild)
 
     fillCard(ul, data)
 
