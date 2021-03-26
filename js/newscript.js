@@ -121,11 +121,11 @@ function enterCity() {
         alert('City ' + cityName + ' was already added to the list')
         return
     }
-    localStorage.setItem(cityName, 'true')
     addCity(cityName)
 }
 
 function addCity(cityName) {
+    localStorage.setItem(cityName, 'true')
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
             let ul = document.getElementById('city-list')
