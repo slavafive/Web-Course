@@ -265,7 +265,12 @@ function hideMainLoader() {
 function createLoader() {
     let loader = document.createElement('div')
     loader.classList.add('loader')
-    return loader
+
+    let loaderContainer = document.createElement('li')
+    loaderContainer.classList.add('city-item')
+    loaderContainer.appendChild(loader)
+
+    return loaderContainer
 }
 
 function showLoader(li) {
