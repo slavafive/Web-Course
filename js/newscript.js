@@ -156,6 +156,7 @@ document.getElementById("add-new-city").addEventListener("keyup", function(event
         }
     });
 
+/*
 function createCity(data) {
     let h3 = document.createElement('h3');
     h3.textContent = data['City']
@@ -207,6 +208,19 @@ function createCity(data) {
     // ul.appendChild(li);
 
     return li
+}
+
+ */
+
+function createCity(data) {
+    let cityTemplate = document.getElementById('city-template')
+    let cityCard = document.importNode(cityTemplate.content, true)
+    cityCard.querySelector('.city-name').textContent = data['City']
+    cityCard.querySelector('.temperature-city-information').textContent = data['Temperature']
+    cityCard.querySelector('.img-city-weather').src = data['Image']
+    let ul = cityCard.querySelector('#city-information-list')
+    fillCard(ul, data)
+    return cityCard
 }
 
 // remove city
@@ -264,6 +278,11 @@ function hideMainLoader() {
 }
 
 function createLoader(cityName) {
+    // let loaderTemplate = document.getElementById('loader-template')
+    // let loaderCard = document.importNode(loaderTemplate.content, true)
+    // loaderCard.querySelector('.city-name').textContent = cityName
+    // return loaderCard
+
     let divCityInformation = document.createElement('div')
     divCityInformation.classList.add('city-information')
 
