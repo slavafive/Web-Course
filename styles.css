@@ -303,13 +303,19 @@ ul li > span:nth-child(1) {
 
 }
 
+/* loader */
+
 .loader {
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #4cc81f; /* Blue */
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     animation: spin 2s linear infinite;
+}
+
+.loader-wrapper {
+    padding: 20px;
 }
 
 .main-loader {
@@ -322,6 +328,7 @@ ul li > span:nth-child(1) {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
 
 
 

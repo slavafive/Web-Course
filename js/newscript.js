@@ -8,6 +8,7 @@ uploadCities()
 function uploadCities() {
     for (let key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
+            console.log(key)
             addCity(key);
         }
     }
@@ -58,10 +59,10 @@ function getCityWeather(url, loader, callback) {
             callback(parseWeatherConditions(data)) // showWeatherForMainCity, hideMainLoader
         })
         .catch(function(error) {
-            if (loader != null) {
-                let ul = document.getElementById('city-list')
-                ul.removeChild(loader)
-            }
+            // if (loader != null) {
+            //     let ul = document.getElementById('city-list')
+            //     ul.removeChild(loader)
+            // }
             if (error == 'Not Found') {
                 alert('City was not found')
             } else {
@@ -82,7 +83,6 @@ function handleErrors(response) {
 // -------------------------------------------------------------------------
 function parseWeatherConditions(data) {
     let overcast = capitalize(data['weather'][0]['description']);
-    console.log(data)
     return {
         'City': data['name'],
         'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
@@ -135,14 +135,15 @@ function enterCity() {
 
 function addCity(cityName) {
     let ul = document.getElementById('city-list')
-    let loader = createLoader()
+    let loader = createLoader(cityName)
     ul.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, loader, function(data) {
             let newLi = createCity(data)
+            // if loader exists (it could have been deleted) only then do this
             ul.removeChild(loader)
             ul.appendChild(newLi)
-            localStorage.setItem(cityName, 'true')
+            localStorage.setItem(data['City'], 'true')
             // hideLoader(newLi)
         }
     )
@@ -262,15 +263,36 @@ function hideMainLoader() {
     document.getElementById('main-city-information-list').hidden = false
 }
 
-function createLoader() {
-    let loader = document.createElement('div')
-    loader.classList.add('loader')
+function createLoader(cityName) {
+    let divCityInformation = document.createElement('div')
+    divCityInformation.classList.add('city-information')
 
-    let loaderContainer = document.createElement('li')
-    loaderContainer.classList.add('city-item')
-    loaderContainer.appendChild(loader)
+    let h3 = document.createElement('h3')
+    h3.textContent = cityName
 
-    return loaderContainer
+    let button = document.createElement('button');
+    button.type = 'submit';
+    button.classList.add('round');
+    button.textContent = 'x';
+    button.addEventListener('click', removeLoader);
+
+    divCityInformation.appendChild(h3)
+    divCityInformation.appendChild(button)
+
+    let divLoaderWrapper = document.createElement('div')
+    divLoaderWrapper.classList.add('loader-wrapper')
+
+    let divLoader = document.createElement('div')
+    divLoader.classList.add('loader')
+
+    divLoaderWrapper.appendChild(divLoader)
+
+    let divCityItem = document.createElement('li')
+    divCityItem.classList.add('city-item')
+    divCityItem.appendChild(divCityInformation)
+    divCityItem.appendChild(divLoaderWrapper)
+
+    return divCityItem
 }
 
 function showLoader(li) {
@@ -308,4 +330,10 @@ function getListElementByCityName(cityName) {
         child = child.nextElementSibling;
     }
     return null;
+}
+
+function removeLoader(event) {
+    let cityName = event.target.previousElementSibling.textContent;
+    event.target.parentElement.parentElement.remove();
+    localStorage.removeItem(cityName);
 }
