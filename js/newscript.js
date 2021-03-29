@@ -1,12 +1,34 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
 hideLoader()
+upload()
 getCurrentGeoposition()
 uploadCities()
 
 
 // upload
 // -------------------------------------------------------------------------
+function upload() {
+    document.getElementById('form').addEventListener('submit', submitForm)
+    document.querySelector('.refresh-small').addEventListener('click', refresh)
+    document.querySelector('.refresh-big').addEventListener('click', refresh)
+}
+
+function submitForm(event) {
+    let field = document.getElementById('add-new-city')
+    let cityName = field.value
+
+    if (localStorage.getItem(cityName) != null) {
+        alert('City ' + cityName + ' was already added to the list')
+    } else {
+        addUnkownCity(cityName)
+    }
+
+    field.value = ''
+    event.preventDefault()
+}
+
+
 function uploadCities() {
     for (let key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
@@ -117,20 +139,20 @@ function getImageNameByOvercast(overcast) {
 
 // add city
 // -------------------------------------------------------------------------
-function enterCity() {
-    let cityName = document.getElementById('add-new-city').value;
-    document.getElementById('add-new-city').value = ''
-    if (!cityName || '' === cityName) {
-        alert('The city name is empty')
-        return
-    }
-    console.log('Get: ' + cityName)
-    if (localStorage.getItem(cityName) != null) {
-        alert('City ' + cityName + ' was already added to the list')
-        return
-    }
-    addUnkownCity(cityName)
-}
+// function enterCity() {
+//     let cityName = document.getElementById('add-new-city').value;
+//     document.getElementById('add-new-city').value = ''
+//     if (!cityName || '' === cityName) {
+//         alert('The city name is empty')
+//         return
+//     }
+//     console.log('Get: ' + cityName)
+//     if (localStorage.getItem(cityName) != null) {
+//         alert('City ' + cityName + ' was already added to the list')
+//         return
+//     }
+//     addUnkownCity(cityName)
+// }
 
 function addUnkownCity(cityName) {
     showLoader()
@@ -161,13 +183,6 @@ function addKnownCity(cityName) {
         }
     )
 }
-
-document.getElementById("add-new-city").addEventListener("keyup", function(event) {
-        event.preventDefault();
-        if (event.keyCode === 13) {
-            document.getElementById("add-city").click();
-        }
-    });
 
 function createCity(data) {
     let cityTemplate = document.getElementById('city-template')
