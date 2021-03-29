@@ -15,6 +15,10 @@
         <button type="submit" class="refresh-small" onclick="refresh()"><img src="images/refresh.png"></button>
     </header>
 
+    <div class="main-loader-wrapper">
+        <div class="loader" id="header-loader"></div>
+    </div>
+
     <main class="main">
 
     <div class="header-city" id="header-city">
@@ -25,9 +29,7 @@
         </div>
     </div>
 
-        <div class="loader main-loader" id="header-loader"></div>
-
-    <div class="header-information">
+    <div class="header-information" id="header-information">
         <ul class="city-information-list" id="main-city-information-list">
             <li><span>Wind</span><span></span></li>
             <li><span>Overcast</span><span></span></li>
@@ -47,6 +49,10 @@
         <input type="text" placeholder="Add new city" class="add-new-city" id="add-new-city">
         <button type="submit" class="round" id="add-city" onclick="enterCity()">+</button>
     </div>
+
+        <div class="add-loader-wrapper" id="add-loader-wrapper">
+            <div class="loader" id="add-loader-child"></div>
+        </div>
 
     <div class="break"></div>
 
@@ -70,7 +76,7 @@
                     <h3 class="city-name"></h3>
                     <p class="temperature-city-information" id="temperature-city-information"></p>
                     <img class="img-city-weather" id="img-city-weather">
-                    <button type="submit" class="round" onclick="removeCity()">x</button>
+                    <button type="submit" class="round">x</button>
                 </div>
                 <ul class="city-information-list" id="city-information-list">
                     <li><span>Wind</span><span></span></li>

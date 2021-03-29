@@ -24,7 +24,7 @@ body {
     text-align: center;
 }
 
-.header, .header-city, .header-information, .break, .favourites, .favourites-add-city, .city, .city-information {
+.header, .header-city, .header-information, .break, .favourites, .favourites-add-city, .city, .city-information, .add-loader-wrapper {
     flex: 1 100%;
 }
 
@@ -322,6 +322,20 @@ ul li > span:nth-child(1) {
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.main-loader-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-loader-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-top: 30px;
 }
 
 @keyframes spin {

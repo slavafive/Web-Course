@@ -1,7 +1,9 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
+hideLoader()
 getCurrentGeoposition()
 uploadCities()
+
 
 // upload
 // -------------------------------------------------------------------------
@@ -9,7 +11,7 @@ function uploadCities() {
     for (let key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
             console.log(key)
-            addCity(key);
+            addKnownCity(key);
         }
     }
 }
@@ -37,7 +39,7 @@ function getCurrentLocation(position) {
 
 function geolocationError(err) {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey})`
-    getCityWeather(url, function(data) {
+    getCityWeather(url, null,function(data) {
         showWeatherForMainCity(data)
     })
 }
@@ -46,25 +48,18 @@ function geolocationError(err) {
 // fetching json
 // -------------------------------------------------------------------------
 function getCityWeather(url, loader, callback) {
-    // let ul = document.getElementById('city-list')
-    // let i = ul.children.length
-    // let li = createLoader()
-    // ul.appendChild(li)
     fetch(url)
         .then(handleErrors)
         .then((response) => {
             return response.json()
         })
         .then((data) => {
-            callback(parseWeatherConditions(data)) // showWeatherForMainCity, hideMainLoader
+            callback(parseWeatherConditions(data))
         })
         .catch(function(error) {
-            // if (loader != null) {
-            //     let ul = document.getElementById('city-list')
-            //     ul.removeChild(loader)
-            // }
-            if (error == 'Not Found') {
+            if (error === 'Not Found') {
                 alert('City was not found')
+                hideLoader()
             } else {
                 alert(error)
             }
@@ -82,9 +77,11 @@ function handleErrors(response) {
 // parsing
 // -------------------------------------------------------------------------
 function parseWeatherConditions(data) {
-    let overcast = capitalize(data['weather'][0]['description']);
+    let overcast = capitalize(data['weather'][0]['description'])
+    let iconType = data['weather'][0]['icon']
     return {
         'City': data['name'],
+        'Icon': `https://openweathermap.org/img/wn/${iconType}@2x.png`,
         'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
         'Image': 'images/' + getImageNameByOvercast(overcast),
         'Wind speed': data['wind']['speed'] + ' m/s',
@@ -122,18 +119,34 @@ function getImageNameByOvercast(overcast) {
 // -------------------------------------------------------------------------
 function enterCity() {
     let cityName = document.getElementById('add-new-city').value;
+    document.getElementById('add-new-city').value = ''
     if (!cityName || '' === cityName) {
         alert('The city name is empty')
         return
     }
+    console.log('Get: ' + cityName)
     if (localStorage.getItem(cityName) != null) {
         alert('City ' + cityName + ' was already added to the list')
         return
     }
-    addCity(cityName)
+    addUnkownCity(cityName)
 }
 
-function addCity(cityName) {
+function addUnkownCity(cityName) {
+    showLoader()
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
+    getCityWeather(url, null, function(data) {
+            let li = createCity(data)
+            let ul = document.getElementById('city-list')
+            ul.appendChild(li)
+            hideLoader()
+            localStorage.setItem(cityName, 'true')
+            console.log('Set: ' + cityName)
+        }
+    )
+}
+
+function addKnownCity(cityName) {
     let ul = document.getElementById('city-list')
     let loader = createLoader(cityName)
     ul.appendChild(loader)
@@ -156,72 +169,18 @@ document.getElementById("add-new-city").addEventListener("keyup", function(event
         }
     });
 
-/*
-function createCity(data) {
-    let h3 = document.createElement('h3');
-    h3.textContent = data['City']
-
-    let p = document.createElement('p');
-    p.classList.add('temperature-city-information');
-    p.textContent = data['Temperature']
-
-    let img = document.createElement('img');
-    img.classList.add('img-city-weather');
-    img.src = data['Image']
-
-    let button = document.createElement('button');
-    button.type = 'submit';
-    button.classList.add('round');
-    button.textContent = 'x';
-    button.addEventListener('click', removeCity);
-
-    let div = document.createElement('div')
-    div.classList.add('city-information');
-
-    div.appendChild(h3);
-    div.appendChild(p);
-    div.appendChild(img);
-    div.appendChild(button);
-
-    let ulChild = document.createElement('ul');
-    ulChild.classList.add('city-information-list');
-
-    for (let i = 0; i < 5; i++) {
-        let li = document.createElement('li');
-        li.appendChild(document.createElement('span'))
-        li.appendChild(document.createElement('span'));
-        ulChild.appendChild(li);
-    }
-
-    fillCard(ulChild, data)
-
-    let li = document.createElement('li');
-    li.classList.add('city-item');
-    li.appendChild(div);
-
-    // let loader = createLoader()
-    // li.appendChild(loader)
-
-    li.appendChild(ulChild)
-
-    // let ul = document.getElementById('city-list');
-    // ul.appendChild(li);
-
-    return li
-}
-
- */
-
 function createCity(data) {
     let cityTemplate = document.getElementById('city-template')
     let cityCard = document.importNode(cityTemplate.content, true)
     cityCard.querySelector('.city-name').textContent = data['City']
     cityCard.querySelector('.temperature-city-information').textContent = data['Temperature']
-    cityCard.querySelector('.img-city-weather').src = data['Image']
+    cityCard.querySelector('.img-city-weather').src = data['Icon']
+    cityCard.querySelector('.round').addEventListener('click', removeCity)
     let ul = cityCard.querySelector('#city-information-list')
     fillCard(ul, data)
     return cityCard
 }
+
 
 // remove city
 // -------------------------------------------------------------------------
@@ -244,7 +203,7 @@ function showWeatherForMainCity(data) {
     let ul = document.getElementById('main-city-information-list')
 
     h2.textContent = data['City']
-    img.src = data['Image']
+    img.src = data['Icon']
     p.textContent = data['Temperature']
 
     fillCard(ul, data)
@@ -266,15 +225,15 @@ function fillCard(ul, data) {
 // loader
 // -------------------------------------------------------------------------
 function showMainLoader() {
-    document.getElementById('header-city').hidden = true
+    // document.getElementById('header-city').hidden = true
     document.getElementById('header-loader').hidden = false
-    document.getElementById('main-city-information-list').hidden = true
+    // document.getElementById('main-city-information-list').hidden = true
 }
 
 function hideMainLoader() {
-    document.getElementById('header-city').hidden = false
+    // document.getElementById('header-city').hidden = false
     document.getElementById('header-loader').hidden = true
-    document.getElementById('main-city-information-list').hidden = false
+    // document.getElementById('main-city-information-list').hidden = false
 }
 
 function createLoader(cityName) {
@@ -314,41 +273,14 @@ function createLoader(cityName) {
     return divCityItem
 }
 
-function showLoader(li) {
-    let div = li.getElementsByClassName('city-information')[0]
-    let loader = li.getElementsByClassName('loader')[0]
-    let ul = li.getElementsByClassName('city-information-list')[0]
-
-    div.getElementsByTagName('p')[0].hidden = true
-    div.getElementsByTagName('img')[0].hidden = true
-    ul.hidden = true
-
-    loader.hidden = false
+function showLoader() {
+    document.getElementById('add-loader-wrapper').hidden = false
+    document.getElementById('add-loader-child').hidden = false
 }
 
-function hideLoader(li) {
-    let div = li.getElementsByClassName('city-information')[0]
-    let loader = li.getElementsByClassName('loader')[0]
-    let ul = li.getElementsByClassName('city-information-list')[0]
-
-    div.getElementsByTagName('p')[0].hidden = false
-    div.getElementsByTagName('img')[0].hidden = false
-    ul.hidden = false
-
-    loader.hidden = true
-}
-
-function getListElementByCityName(cityName) {
-    let ul = document.getElementById('city-list');
-    let child = ul.firstElementChild;
-    while (child) {
-        let currentCityName = child.firstElementChild.firstElementChild.textContent;
-        if (cityName == currentCityName) {
-            return child;
-        }
-        child = child.nextElementSibling;
-    }
-    return null;
+function hideLoader() {
+    document.getElementById('add-loader-wrapper').hidden = true
+    document.getElementById('add-loader-child').hidden = true
 }
 
 function removeLoader(event) {
