@@ -164,7 +164,7 @@ function addKnownCity(cityName) {
             let newLi = createCity(data)
             ul.removeChild(loader)
             ul.appendChild(newLi)
-            // localStorage.setItem(cityName, 'true')
+            localStorage.setItem(cityName, 'true')
         }
     )
 }
