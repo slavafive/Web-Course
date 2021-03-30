@@ -59,14 +59,14 @@ function getCurrentGeoposition() {
 
 function getCurrentLocation(position) {
     let url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}`
-    getCityWeather(url, null,function(data) {
+    getCityWeather(url,function(data) {
         showWeatherForMainCity(data)
     })
 }
 
 function geolocationError(err) {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey})`
-    getCityWeather(url, null,function(data) {
+    getCityWeather(url,function(data) {
         showWeatherForMainCity(data)
     })
 }
@@ -74,7 +74,7 @@ function geolocationError(err) {
 
 // fetching json
 // -------------------------------------------------------------------------
-function getCityWeather(url, loader, callback) {
+function getCityWeather(url, callback) {
     fetch(url)
         .then(handleErrors)
         .then((response) => {
@@ -146,7 +146,7 @@ function getImageNameByOvercast(overcast) {
 function addUnkownCity(cityName) {
     showLoader()
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    getCityWeather(url, null, function(data) {
+    getCityWeather(url, function(data) {
             let li = createCity(data)
             let ul = document.getElementById('city-list')
             ul.appendChild(li)
@@ -164,7 +164,7 @@ function addKnownCity(cityName) {
     let loader = createLoader(cityName)
     ul.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    getCityWeather(url, loader, function(data) {
+    getCityWeather(url, function(data) {
             let newLi = createCity(data)
             ul.removeChild(loader)
             ul.appendChild(newLi)
@@ -264,40 +264,43 @@ function hideMainLoader() {
 }
 
 function createLoader(cityName) {
-    // let loaderTemplate = document.getElementById('loader-template')
-    // let loaderCard = document.importNode(loaderTemplate.content, true)
-    // loaderCard.querySelector('.city-name').textContent = cityName
-    // return loaderCard
+    let loaderTemplate = document.getElementById('loader-template')
+    let loaderCard = document.importNode(loaderTemplate.content, true)
+    loaderCard.querySelector('.city-name').textContent = cityName
+    loaderCard.querySelector('.round').addEventListener('click', removeLoader)
+    loaderCard.querySelector('.city-item').id = 'loader-' + cityName
+    return loaderCard.querySelector('.city-item')
 
-    let divCityInformation = document.createElement('div')
-    divCityInformation.classList.add('city-information')
-
-    let h3 = document.createElement('h3')
-    h3.textContent = cityName
-
-    let button = document.createElement('button');
-    button.type = 'submit';
-    button.classList.add('round');
-    button.textContent = 'x';
-    button.addEventListener('click', removeLoader);
-
-    divCityInformation.appendChild(h3)
-    divCityInformation.appendChild(button)
-
-    let divLoaderWrapper = document.createElement('div')
-    divLoaderWrapper.classList.add('loader-wrapper')
-
-    let divLoader = document.createElement('div')
-    divLoader.classList.add('loader')
-
-    divLoaderWrapper.appendChild(divLoader)
-
-    let divCityItem = document.createElement('li')
-    divCityItem.classList.add('city-item')
-    divCityItem.appendChild(divCityInformation)
-    divCityItem.appendChild(divLoaderWrapper)
-
-    return divCityItem
+    // let divCityInformation = document.createElement('div')
+    // divCityInformation.classList.add('city-information')
+    //
+    // let h3 = document.createElement('h3')
+    // h3.textContent = cityName
+    //
+    // let button = document.createElement('button');
+    // button.type = 'submit';
+    // button.classList.add('round');
+    // button.textContent = 'x';
+    // button.addEventListener('click', removeLoader);
+    //
+    // divCityInformation.appendChild(h3)
+    // divCityInformation.appendChild(button)
+    //
+    //
+    // let divLoaderWrapper = document.createElement('div')
+    // divLoaderWrapper.classList.add('loader-wrapper')
+    //
+    // let divLoader = document.createElement('div')
+    // divLoader.classList.add('loader')
+    //
+    // divLoaderWrapper.appendChild(divLoader)
+    //
+    // let divCityItem = document.createElement('li')
+    // divCityItem.classList.add('city-item')
+    // divCityItem.appendChild(divCityInformation)
+    // divCityItem.appendChild(divLoaderWrapper)
+    //
+    // return divCityItem
 }
 
 function showLoader() {
