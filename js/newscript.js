@@ -1,6 +1,5 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
-localStorage.clear()
 hideLoader()
 upload()
 getCurrentGeoposition()
