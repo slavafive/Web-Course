@@ -41,6 +41,8 @@ function uploadCities() {
 // refresh
 // -------------------------------------------------------------------------
 function refresh() {
+    let ul = document.getElementById('main-city-information-list')
+    unFillCard(ul)
     getCurrentGeoposition()
 }
 
@@ -137,23 +139,6 @@ function getImageNameByOvercast(overcast) {
 }
 
 
-// add city
-// -------------------------------------------------------------------------
-// function enterCity() {
-//     let cityName = document.getElementById('add-new-city').value;
-//     document.getElementById('add-new-city').value = ''
-//     if (!cityName || '' === cityName) {
-//         alert('The city name is empty')
-//         return
-//     }
-//     console.log('Get: ' + cityName)
-//     if (localStorage.getItem(cityName) != null) {
-//         alert('City ' + cityName + ' was already added to the list')
-//         return
-//     }
-//     addUnkownCity(cityName)
-// }
-
 function addUnkownCity(cityName) {
     showLoader()
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
@@ -175,11 +160,9 @@ function addKnownCity(cityName) {
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, loader, function(data) {
             let newLi = createCity(data)
-            // if loader exists (it could have been deleted) only then do this
             ul.removeChild(loader)
             ul.appendChild(newLi)
             localStorage.setItem(data['City'], 'true')
-            // hideLoader(newLi)
         }
     )
 }
@@ -237,18 +220,31 @@ function fillCard(ul, data) {
 }
 
 
+function unFillCard(ul) {
+    let currentElement = ul.firstElementChild
+    for (let i = 0; i < 5; i++) {
+        currentElement.lastElementChild.textContent = ''
+        currentElement = currentElement.nextElementSibling
+    }
+}
+
+
 // loader
 // -------------------------------------------------------------------------
 function showMainLoader() {
-    // document.getElementById('header-city').hidden = true
-    document.getElementById('header-loader').hidden = false
+    document.querySelector('.img-header-city').hidden = true
+    document.querySelector('.temperature-header-city').hidden = true
+    document.getElementById('h2').hidden = true
     // document.getElementById('main-city-information-list').hidden = true
+    document.getElementById('header-loader').hidden = false
 }
 
 function hideMainLoader() {
-    // document.getElementById('header-city').hidden = false
-    document.getElementById('header-loader').hidden = true
+    document.querySelector('.img-header-city').hidden = false
+    document.querySelector('.temperature-header-city').hidden = false
+    document.getElementById('h2').hidden = false
     // document.getElementById('main-city-information-list').hidden = false
+    document.getElementById('header-loader').hidden = true
 }
 
 function createLoader(cityName) {

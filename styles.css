@@ -321,7 +321,6 @@ ul li > span:nth-child(1) {
 .main-loader {
     position: absolute;
     left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .main-loader-wrapper {
