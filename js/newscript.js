@@ -1,5 +1,6 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
+localStorage.clear()
 hideLoader()
 upload()
 getCurrentGeoposition()
@@ -92,6 +93,7 @@ function getCityWeather(url, loader, callback) {
 
 function handleErrors(response) {
     if (!response.ok) {
+        console.log('error')
         throw response.statusText
     }
     return response
@@ -162,7 +164,7 @@ function addKnownCity(cityName) {
             let newLi = createCity(data)
             ul.removeChild(loader)
             ul.appendChild(newLi)
-            localStorage.setItem(data['City'], 'true')
+            // localStorage.setItem(cityName, 'true')
         }
     )
 }
