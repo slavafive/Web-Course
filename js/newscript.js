@@ -1,6 +1,6 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 
-// localStorage.clear()
+mapping = {}
 hideLoader()
 upload()
 getCurrentGeoposition()
@@ -19,8 +19,10 @@ function submitForm(event) {
     let field = document.getElementById('add-new-city')
     let cityName = field.value
 
-    if (localStorage.getItem(cityName) != null) {
+    if (localStorage.getItem(cityName) != null || cityName in mapping) {
         alert('City ' + cityName + ' was already added to the list')
+    } else if (cityName.trim() === '') {
+        alert('City was not found')
     } else {
         addUnkownCity(cityName)
     }
@@ -150,6 +152,8 @@ function addUnkownCity(cityName) {
             ul.appendChild(li)
             hideLoader()
             localStorage.setItem(cityName, 'true')
+            mapping[data['City']] = cityName
+            mapping[cityName] = data['City']
             console.log('Set: ' + cityName)
         }
     )
@@ -165,6 +169,8 @@ function addKnownCity(cityName) {
             ul.removeChild(loader)
             ul.appendChild(newLi)
             localStorage.setItem(cityName, 'true')
+            mapping[data['City']] = cityName
+            mapping[cityName] = data['City']
         }
     )
 }
@@ -187,7 +193,15 @@ function createCity(data) {
 function removeCity(event) {
     let cityName = event.target.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
     event.target.parentElement.parentElement.remove();
-    localStorage.removeItem(cityName);
+    localStorage.removeItem(mapping[cityName]);
+
+    console.log('cityName: ' + cityName)
+    console.log(mapping)
+
+    if (cityName !== mapping[cityName]) {
+        delete mapping[mapping[cityName]]
+    }
+    delete mapping[cityName]
 }
 
 
@@ -297,7 +311,12 @@ function hideLoader() {
 }
 
 function removeLoader(event) {
-    let cityName = event.target.previousElementSibling.textContent;
-    event.target.parentElement.parentElement.remove();
-    localStorage.removeItem(cityName);
+    let cityName = event.target.previousElementSibling.textContent
+    event.target.parentElement.parentElement.remove()
+    localStorage.removeItem(cityName)
+
+    if (cityName !== mapping[cityName]) {
+        delete mapping[mapping[cityName]]
+    }
+    delete mapping[cityName]
 }
