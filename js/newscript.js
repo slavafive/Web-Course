@@ -18,9 +18,10 @@ function submitForm(event) {
     let field = document.getElementById('add-new-city')
     let cityName = field.value
 
+    cityName = cityName.trim()
     if (localStorage.getItem(cityName) != null || cityName in cityMapping) {
         alert('City ' + cityName + ' was already added to the list')
-    } else if (cityName.trim() === '') {
+    } else if (cityName === '') {
         alert('City ' + cityName + ' was not found')
     } else {
         addUnkownCity(cityName)
