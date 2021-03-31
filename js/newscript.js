@@ -1,28 +1,27 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
-
-mapping = {}
-hideLoader()
-upload()
-getCurrentGeoposition()
-uploadCities()
-
+cityMapping = {}
 
 // upload
 // -------------------------------------------------------------------------
+upload()
+
 function upload() {
+    hideLoader()
     document.getElementById('form').addEventListener('submit', submitForm)
     document.querySelector('.refresh-small').addEventListener('click', refresh)
     document.querySelector('.refresh-big').addEventListener('click', refresh)
+    getCurrentGeoposition()
+    uploadCities()
 }
 
 function submitForm(event) {
     let field = document.getElementById('add-new-city')
     let cityName = field.value
 
-    if (localStorage.getItem(cityName) != null || cityName in mapping) {
+    if (localStorage.getItem(cityName) != null || cityName in cityMapping) {
         alert('City ' + cityName + ' was already added to the list')
     } else if (cityName.trim() === '') {
-        alert('City was not found')
+        alert('City ' + cityName + ' was not found')
     } else {
         addUnkownCity(cityName)
     }
@@ -35,7 +34,6 @@ function submitForm(event) {
 function uploadCities() {
     for (let key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
-            console.log(key)
             addKnownCity(key);
         }
     }
@@ -44,8 +42,8 @@ function uploadCities() {
 // refresh
 // -------------------------------------------------------------------------
 function refresh() {
-    let ul = document.getElementById('main-city-information-list')
-    unFillCard(ul)
+    let mainCityList = document.getElementById('main-city-information-list')
+    unFillCard(mainCityList)
     getCurrentGeoposition()
 }
 
@@ -59,6 +57,7 @@ function getCurrentGeoposition() {
 
 function getCurrentLocation(position) {
     let url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}`
+    console.log(url)
     getCityWeather(url,function(data) {
         showWeatherForMainCity(data)
     })
@@ -95,7 +94,6 @@ function getCityWeather(url, callback) {
 
 function handleErrors(response) {
     if (!response.ok) {
-        console.log('error')
         throw response.statusText
     }
     return response
@@ -111,7 +109,6 @@ function parseWeatherConditions(data) {
         'City': data['name'],
         'Icon': `https://openweathermap.org/img/wn/${iconType}@2x.png`,
         'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
-        'Image': 'images/' + getImageNameByOvercast(overcast),
         'Wind speed': data['wind']['speed'] + ' m/s',
         'Overcast': overcast,
         'Pressure': data['main']['pressure'] + ' hpa',
@@ -124,55 +121,39 @@ function capitalize(str) {
     return str.replace(/^\w/, (c) => c.toUpperCase());
 }
 
-function getImageNameByOvercast(overcast) {
-    switch (overcast) {
-        case 'Few clouds':
-            return 'sunny-cloudy.png';
-        case 'Clear sky':
-        case 'Sunny':
-            return 'sunny.png';
-        case 'Rain':
-            return 'rain.png';
-        case 'Light snow':
-        case 'Snow':
-        case 'Heavy snow':
-            return 'snow.png';
-        default:
-            return 'cloudy.png';
-    }
-}
-
 
 function addUnkownCity(cityName) {
     showLoader()
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
-            let li = createCity(data)
-            let ul = document.getElementById('city-list')
-            ul.appendChild(li)
+            let cityItem = createCity(data)
+            let cityList = document.getElementById('city-list')
+            cityList.appendChild(cityItem)
             hideLoader()
             localStorage.setItem(cityName, 'true')
-            mapping[data['City']] = cityName
-            mapping[cityName] = data['City']
-            console.log('Set: ' + cityName)
+            setMapping(data, cityName)
         }
     )
 }
 
 function addKnownCity(cityName) {
-    let ul = document.getElementById('city-list')
+    let cityList = document.getElementById('city-list')
     let loader = createLoader(cityName)
-    ul.appendChild(loader)
+    cityList.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
-            let newLi = createCity(data)
-            ul.removeChild(loader)
-            ul.appendChild(newLi)
+            let newCityItem = createCity(data)
+            cityList.removeChild(loader)
+            cityList.appendChild(newCityItem)
             localStorage.setItem(cityName, 'true')
-            mapping[data['City']] = cityName
-            mapping[cityName] = data['City']
+            setMapping(data, cityName)
         }
     )
+}
+
+function setMapping(data, cityName) {
+    cityMapping[data['City']] = cityName
+    cityMapping[cityName] = data['City']
 }
 
 function createCity(data) {
@@ -193,32 +174,20 @@ function createCity(data) {
 function removeCity(event) {
     let cityName = event.target.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
     event.target.parentElement.parentElement.remove();
-    localStorage.removeItem(mapping[cityName]);
-
-    console.log('cityName: ' + cityName)
-    console.log(mapping)
-
-    if (cityName !== mapping[cityName]) {
-        delete mapping[mapping[cityName]]
-    }
-    delete mapping[cityName]
+    removeCityFromStorage(cityName)
 }
 
 
 // display weather
 // -------------------------------------------------------------------------
 function showWeatherForMainCity(data) {
-    let div = document.getElementById('header-city')
+    let headerDiv = document.getElementById('header-city')
 
-    let h2 = div.firstElementChild
-    let divChild = div.lastElementChild
-    let img = divChild.firstElementChild
-    let p = divChild.lastElementChild
+    headerDiv.getElementsByTagName('h2')[0].textContent = data['City']
+    let divChild = headerDiv.getElementsByTagName('div')[0]
+    divChild.getElementsByTagName('img')[0].src = data['Icon']
+    divChild.getElementsByTagName('p')[0].textContent = data['Temperature']
     let ul = document.getElementById('main-city-information-list')
-
-    h2.textContent = data['City']
-    img.src = data['Icon']
-    p.textContent = data['Temperature']
 
     fillCard(ul, data)
 
@@ -270,37 +239,6 @@ function createLoader(cityName) {
     loaderCard.querySelector('.round').addEventListener('click', removeLoader)
     loaderCard.querySelector('.city-item').id = 'loader-' + cityName
     return loaderCard.querySelector('.city-item')
-
-    // let divCityInformation = document.createElement('div')
-    // divCityInformation.classList.add('city-information')
-    //
-    // let h3 = document.createElement('h3')
-    // h3.textContent = cityName
-    //
-    // let button = document.createElement('button');
-    // button.type = 'submit';
-    // button.classList.add('round');
-    // button.textContent = 'x';
-    // button.addEventListener('click', removeLoader);
-    //
-    // divCityInformation.appendChild(h3)
-    // divCityInformation.appendChild(button)
-    //
-    //
-    // let divLoaderWrapper = document.createElement('div')
-    // divLoaderWrapper.classList.add('loader-wrapper')
-    //
-    // let divLoader = document.createElement('div')
-    // divLoader.classList.add('loader')
-    //
-    // divLoaderWrapper.appendChild(divLoader)
-    //
-    // let divCityItem = document.createElement('li')
-    // divCityItem.classList.add('city-item')
-    // divCityItem.appendChild(divCityInformation)
-    // divCityItem.appendChild(divLoaderWrapper)
-    //
-    // return divCityItem
 }
 
 function showLoader() {
@@ -316,10 +254,13 @@ function hideLoader() {
 function removeLoader(event) {
     let cityName = event.target.previousElementSibling.textContent
     event.target.parentElement.parentElement.remove()
-    localStorage.removeItem(cityName)
+    removeCityFromStorage(cityName)
+}
 
-    if (cityName !== mapping[cityName]) {
-        delete mapping[mapping[cityName]]
+function removeCityFromStorage(cityName) {
+    localStorage.removeItem(cityName)
+    if (cityName !== cityMapping[cityName]) {
+        delete cityMapping[cityMapping[cityName]]
     }
-    delete mapping[cityName]
+    delete cityMapping[cityName]
 }
