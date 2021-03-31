@@ -64,7 +64,7 @@ function getCurrentLocation(position) {
 }
 
 function geolocationError(err) {
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey})`
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey}`
     getCityWeather(url,function(data) {
         showWeatherForMainCity(data)
     })
