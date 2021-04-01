@@ -1,5 +1,7 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 cityMapping = {}
+idCityMapping = {}
+cityIdMapping = {}
 
 // upload
 // -------------------------------------------------------------------------
@@ -81,15 +83,16 @@ function getCityWeather(url, callback) {
             return response.json()
         })
         .then((data) => {
+            console.log(data)
             callback(parseWeatherConditions(data))
         })
         .catch(function(error) {
             if (error === 'Not Found') {
                 alert('City was not found')
-                hideLoader()
             } else {
                 alert(error)
             }
+            hideLoader()
         })
 }
 
@@ -106,7 +109,9 @@ function handleErrors(response) {
 function parseWeatherConditions(data) {
     let overcast = capitalize(data['weather'][0]['description'])
     let iconType = data['weather'][0]['icon']
+    console.log(data['id'])
     return {
+        'Id': data['id'],
         'City': data['name'],
         'Icon': `https://openweathermap.org/img/wn/${iconType}@2x.png`,
         'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
@@ -127,6 +132,13 @@ function addUnkownCity(cityName) {
     showLoader()
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
+            if (data['Id'] in idCityMapping) {
+                alert('City ' + cityName + ' was already added to the list')
+                hideLoader()
+                return
+            }
+            idCityMapping[data['Id']] = cityName
+            cityIdMapping[cityName] = data['Id']
             let cityItem = createCity(data)
             let cityList = document.getElementById('city-list')
             cityList.appendChild(cityItem)
@@ -143,6 +155,8 @@ function addKnownCity(cityName) {
     cityList.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
+            idCityMapping[data['Id']] = cityName
+            cityIdMapping[cityName] = data['Id']
             let newCityItem = createCity(data)
             cityList.removeChild(loader)
             cityList.appendChild(newCityItem)
@@ -260,6 +274,9 @@ function removeLoader(event) {
 
 function removeCityFromStorage(cityName) {
     localStorage.removeItem(cityName)
+    let id_ = cityIdMapping[cityName]
+    delete idCityMapping[id_]
+    delete cityIdMapping[cityName]
     if (cityName !== cityMapping[cityName]) {
         delete cityMapping[cityMapping[cityName]]
     }
