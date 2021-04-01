@@ -2,6 +2,7 @@ apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
 cityMapping = {}
 idCityMapping = {}
 cityIdMapping = {}
+deletedCities = {}
 
 // upload
 // -------------------------------------------------------------------------
@@ -137,14 +138,14 @@ function addUnkownCity(cityName) {
                 hideLoader()
                 return
             }
-            idCityMapping[data['Id']] = cityName
-            cityIdMapping[cityName] = data['Id']
+            idCityMapping[data['Id']] = data['City']
+            cityIdMapping[data['City']] = data['Id']
             let cityItem = createCity(data)
             let cityList = document.getElementById('city-list')
             cityList.appendChild(cityItem)
             hideLoader()
-            localStorage.setItem(cityName, 'true')
-            setMapping(data, cityName)
+            localStorage.setItem(data['City'], 'true')
+            setMapping(data, data['City'])
         }
     )
 }
@@ -155,13 +156,26 @@ function addKnownCity(cityName) {
     cityList.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
     getCityWeather(url, function(data) {
-            idCityMapping[data['Id']] = cityName
-            cityIdMapping[cityName] = data['Id']
+            if (data['City'] in deletedCities) {
+                return
+            }
+            idCityMapping[data['Id']] = data['City']
+            cityIdMapping[data['City']] = data['Id']
             let newCityItem = createCity(data)
+            console.log(loader.id)
+            // let ids = cityList.getElementsByTagName('li')
+            // for (let id_ in ids) {
+            //     if (id_ === loader.id) {
+            //         cityList.removeChild(loader)
+            //         cityList.appendChild(newCityItem)
+            //         localStorage.setItem(data['City'], 'true')
+            //         setMapping(data, data['City'])
+            //     }
+            // }
             cityList.removeChild(loader)
             cityList.appendChild(newCityItem)
-            localStorage.setItem(cityName, 'true')
-            setMapping(data, cityName)
+            localStorage.setItem(data['City'], 'true')
+            setMapping(data, data['City'])
         }
     )
 }
@@ -270,6 +284,7 @@ function removeLoader(event) {
     let cityName = event.target.previousElementSibling.textContent
     event.target.parentElement.parentElement.remove()
     removeCityFromStorage(cityName)
+    deletedCities[cityName] = true
 }
 
 function removeCityFromStorage(cityName) {
