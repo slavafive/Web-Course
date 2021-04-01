@@ -4,6 +4,8 @@ idCityMapping = {}
 cityIdMapping = {}
 deletedCities = {}
 
+localStorage.clear()
+
 // upload
 // -------------------------------------------------------------------------
 upload()
