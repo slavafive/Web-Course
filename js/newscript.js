@@ -159,7 +159,6 @@ function addKnownCity(cityName) {
             if (data['City'] in deletedCities) {
                 return
             }
-            try {
                 idCityMapping[data['Id']] = data['City']
                 cityIdMapping[data['City']] = data['Id']
                 let newCityItem = createCity(data)
@@ -167,9 +166,6 @@ function addKnownCity(cityName) {
                 cityList.appendChild(newCityItem)
                 localStorage.setItem(data['City'], 'true')
                 setMapping(data, data['City'])
-            } catch (error) {
-                return
-            }
         }
     )
 }
