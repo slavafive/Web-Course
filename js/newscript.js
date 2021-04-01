@@ -159,23 +159,17 @@ function addKnownCity(cityName) {
             if (data['City'] in deletedCities) {
                 return
             }
-            idCityMapping[data['Id']] = data['City']
-            cityIdMapping[data['City']] = data['Id']
-            let newCityItem = createCity(data)
-            console.log(loader.id)
-            // let ids = cityList.getElementsByTagName('li')
-            // for (let id_ in ids) {
-            //     if (id_ === loader.id) {
-            //         cityList.removeChild(loader)
-            //         cityList.appendChild(newCityItem)
-            //         localStorage.setItem(data['City'], 'true')
-            //         setMapping(data, data['City'])
-            //     }
-            // }
-            cityList.removeChild(loader)
-            cityList.appendChild(newCityItem)
-            localStorage.setItem(data['City'], 'true')
-            setMapping(data, data['City'])
+            try {
+                idCityMapping[data['Id']] = data['City']
+                cityIdMapping[data['City']] = data['Id']
+                let newCityItem = createCity(data)
+                cityList.removeChild(loader)
+                cityList.appendChild(newCityItem)
+                localStorage.setItem(data['City'], 'true')
+                setMapping(data, data['City'])
+            } catch (error) {
+                return
+            }
         }
     )
 }
