@@ -1,11 +1,5 @@
 apiKey = 'ae89b8a5c63d75e64e33be5a6e8f6ce2'
-cityMapping = {}
-idCityMapping = {}
-cityIdMapping = {}
-deletedCities = {}
 
-localStorage.clear()
-// upload
 // -------------------------------------------------------------------------
 upload()
 
@@ -22,14 +16,7 @@ function submitForm(event) {
     let field = document.getElementById('add-new-city')
     let cityName = field.value
 
-    cityName = cityName.trim()
-    if (localStorage.getItem(cityName) != null || cityName in cityMapping) {
-        alert('City ' + cityName + ' was already added to the list')
-    } else if (cityName === '') {
-        alert('City ' + cityName + ' was not found')
-    } else {
-        addUnkownCity(cityName)
-    }
+    addUnkownCity(cityName)
 
     field.value = ''
     event.preventDefault()
@@ -96,13 +83,14 @@ function getCityWeather(url, params, callback) {
             callback(parseWeatherConditions(data))
         })
         .catch(function(error) {
-            if (error === 'Not Found') {
+            if (error === 'Bad Request') {
+                alert(`City was already added to the list`)
+            } else if (error === 'Not Found') {
                 alert('City was not found')
             } else {
                 alert(error)
             }
             hideLoader()
-            console.log(error)
         })
 }
 
@@ -123,7 +111,7 @@ function parseWeatherConditions(data) {
         'Id': data['id'],
         'City': data['name'],
         'Icon': `https://openweathermap.org/img/wn/${iconType}@2x.png`,
-        'Temperature': (Math.round(data['main']['temp']) - 273).toString() + '\xB0C',
+        'Temperature': (Math.round(data['main']['temp'])).toString() + '\xB0C',
         'Wind speed': data['wind']['speed'] + ' m/s',
         'Overcast': overcast,
         'Pressure': data['main']['pressure'] + ' hpa',
@@ -139,7 +127,6 @@ function capitalize(str) {
 
 function addUnkownCity(cityName) {
     showLoader()
-    // createCity(), getCityWeatherByName()
     let url = `http://localhost:8080/favourites`
     let params = {
         method: 'POST',
@@ -148,22 +135,11 @@ function addUnkownCity(cityName) {
         },
         body: JSON.stringify({ 'name': cityName })
     }
-    url = `http://localhost:8080/weather/city?q=${cityName}`
-    params = {}
     getCityWeather(url, params, function(data) {
-            if (data['Id'] in idCityMapping) {
-                alert('City ' + cityName + ' was already added to the list')
-                hideLoader()
-                return
-            }
-            idCityMapping[data['Id']] = data['City']
-            cityIdMapping[data['City']] = data['Id']
             let cityItem = createCity(data)
             let cityList = document.getElementById('city-list')
             cityList.appendChild(cityItem)
             hideLoader()
-            // localStorage.setItem(data['City'], 'true')
-            // setMapping(data, data['City'])
         }
     )
 }
@@ -172,29 +148,17 @@ function addKnownCity(cityName) {
     let cityList = document.getElementById('city-list')
     let loader = createLoader(cityName)
     cityList.appendChild(loader)
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
+    let url = `http://localhost:8080/weather/city?q=${cityName}`
     getCityWeather(url, {}, function(data) {
-            if (data['City'] in deletedCities) {
-                return
-            }
             try {
-                idCityMapping[data['Id']] = data['City']
-                cityIdMapping[data['City']] = data['Id']
                 let newCityItem = createCity(data)
                 cityList.removeChild(loader)
                 cityList.appendChild(newCityItem)
-                // localStorage.setItem(data['City'], 'true')
-                // setMapping(data, data['City'])
             } catch (error) {
                 return
             }
         }
     )
-}
-
-function setMapping(data, cityName) {
-    cityMapping[data['City']] = cityName
-    cityMapping[cityName] = data['City']
 }
 
 function createCity(data) {
@@ -239,8 +203,8 @@ function fillCard(ul, data) {
     let keys = ['Wind speed', 'Overcast', 'Pressure', 'Humidity', 'Coordinates']
     let currentElement = ul.firstElementChild
     for (let i = 0; i < keys.length; i++) {
-        currentElement.firstElementChild.textContent = keys[i] // first span
-        currentElement.lastElementChild.textContent = data[keys[i]] // second span
+        currentElement.firstElementChild.textContent = keys[i]
+        currentElement.lastElementChild.textContent = data[keys[i]]
         currentElement = currentElement.nextElementSibling
     }
 }
@@ -296,7 +260,6 @@ function removeLoader(event) {
     let cityName = event.target.previousElementSibling.textContent
     event.target.parentElement.parentElement.remove()
     removeCityFromStorage(cityName)
-    deletedCities[cityName] = true
 }
 
 function removeCityFromStorage(cityName) {
@@ -320,13 +283,4 @@ function removeCityFromStorage(cityName) {
         .catch(function(error) {
             alert(error)
         })
-
-    localStorage.removeItem(cityName)
-    let id_ = cityIdMapping[cityName]
-    delete idCityMapping[id_]
-    delete cityIdMapping[cityName]
-    if (cityName !== cityMapping[cityName]) {
-        delete cityMapping[cityMapping[cityName]]
-    }
-    delete cityMapping[cityName]
 }
