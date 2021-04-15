@@ -32,18 +32,30 @@ function performQuery(sql, callback, onError) {
     })
 }
 
+function getCityWeatherByName(req, res, cityName) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
+    makeRequest(url,
+        function (data) {
+            res.status(200).send(data)
+        }, function (error) {
+            res.status(404).send(error)
+        })
+}
+
 class CityController {
 
     async createCity(req, res) {
         const cityName = req.body.name
+        console.log('createCity() ' + cityName)
         database.query(`SELECT name FROM city WHERE name = '${cityName}'`, (err, data) => {
             if (err) {
                 res.status(404).send(err)
             } else {
                 if (data.rows.length === 0) {
-                    performQuery(`INSERT INTO city (name) VALUES ('${cityName}') RETURNING *`,
+                    performQuery(`INSERT INTO city (name) VALUES ('${cityName}')`,
                         function (data) {
-                            res.status(200).send(data.rows)
+                        let weather = getCityWeatherByName(req, res, cityName)
+                            res.status(200).send(weather)
                         }, function (error) {
                             res.status(404).send(error)
                         })
@@ -52,9 +64,21 @@ class CityController {
                 }
             }
         })
+
+        let weather = getCityWeatherByName(req, res, cityName)
+        let cityId = weather['id']
+        database.query(`SELECT id FROM city WHERE id = '${cityId}'`, (err, data) => {
+            if (err) {
+                res.status(404).send(err)
+            }
+            if (data.rows.length > 0) {
+                res.status(404).send('City already exists')
+            }
+        })
     }
 
     async getCities(req, res) {
+        console.log('getCities()')
         performQuery('SELECT name FROM city',
             function (data) {
                 let cities = []
@@ -69,6 +93,7 @@ class CityController {
 
     async deleteCity(req, res) {
         const cityName = req.body.name
+        console.log('deleteCity() ' + cityName)
         performQuery(`DELETE FROM city WHERE name = '${cityName}'`,
             function (data) {
                 res.status(200).send(data)

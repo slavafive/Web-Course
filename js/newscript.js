@@ -4,6 +4,7 @@ idCityMapping = {}
 cityIdMapping = {}
 deletedCities = {}
 
+localStorage.clear()
 // upload
 // -------------------------------------------------------------------------
 upload()
@@ -36,11 +37,20 @@ function submitForm(event) {
 
 
 function uploadCities() {
-    for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-            addKnownCity(key);
-        }
-    }
+    let url = 'http://localhost:8080/favourites'
+    fetch(url)
+        .then(handleErrors)
+        .then((response) => {
+            return response.json()
+        })
+        .then((cities) => {
+            for (let i = 0; i < cities.length; i++) {
+                addKnownCity(cities[i])
+            }
+        })
+        .catch(function(error) {
+            alert(error)
+        })
 }
 
 // refresh
@@ -60,16 +70,15 @@ function getCurrentGeoposition() {
 }
 
 function getCurrentLocation(position) {
-    let url = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}`
-    console.log(url)
-    getCityWeather(url,function(data) {
+    let url = `http://localhost:8080/weather/coordinates?lat=${position.coords.latitude}&lon=${position.coords.longitude}`
+    getCityWeather(url,{}, function(data) {
         showWeatherForMainCity(data)
     })
 }
 
 function geolocationError(err) {
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=Moscow&appid=${apiKey}`
-    getCityWeather(url,function(data) {
+    let url = `http://localhost:8080/weather/city?q=Moscow`
+    getCityWeather(url,{}, function(data) {
         showWeatherForMainCity(data)
     })
 }
@@ -77,14 +86,13 @@ function geolocationError(err) {
 
 // fetching json
 // -------------------------------------------------------------------------
-function getCityWeather(url, callback) {
-    fetch(url)
+function getCityWeather(url, params, callback) {
+    fetch(url, params)
         .then(handleErrors)
         .then((response) => {
             return response.json()
         })
         .then((data) => {
-            console.log(data)
             callback(parseWeatherConditions(data))
         })
         .catch(function(error) {
@@ -94,6 +102,7 @@ function getCityWeather(url, callback) {
                 alert(error)
             }
             hideLoader()
+            console.log(error)
         })
 }
 
@@ -110,7 +119,6 @@ function handleErrors(response) {
 function parseWeatherConditions(data) {
     let overcast = capitalize(data['weather'][0]['description'])
     let iconType = data['weather'][0]['icon']
-    console.log(data['id'])
     return {
         'Id': data['id'],
         'City': data['name'],
@@ -131,8 +139,18 @@ function capitalize(str) {
 
 function addUnkownCity(cityName) {
     showLoader()
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    getCityWeather(url, function(data) {
+    // createCity(), getCityWeatherByName()
+    let url = `http://localhost:8080/favourites`
+    let params = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'name': cityName })
+    }
+    url = `http://localhost:8080/weather/city?q=${cityName}`
+    params = {}
+    getCityWeather(url, params, function(data) {
             if (data['Id'] in idCityMapping) {
                 alert('City ' + cityName + ' was already added to the list')
                 hideLoader()
@@ -144,8 +162,8 @@ function addUnkownCity(cityName) {
             let cityList = document.getElementById('city-list')
             cityList.appendChild(cityItem)
             hideLoader()
-            localStorage.setItem(data['City'], 'true')
-            setMapping(data, data['City'])
+            // localStorage.setItem(data['City'], 'true')
+            // setMapping(data, data['City'])
         }
     )
 }
@@ -155,7 +173,7 @@ function addKnownCity(cityName) {
     let loader = createLoader(cityName)
     cityList.appendChild(loader)
     let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
-    getCityWeather(url, function(data) {
+    getCityWeather(url, {}, function(data) {
             if (data['City'] in deletedCities) {
                 return
             }
@@ -165,8 +183,8 @@ function addKnownCity(cityName) {
                 let newCityItem = createCity(data)
                 cityList.removeChild(loader)
                 cityList.appendChild(newCityItem)
-                localStorage.setItem(data['City'], 'true')
-                setMapping(data, data['City'])
+                // localStorage.setItem(data['City'], 'true')
+                // setMapping(data, data['City'])
             } catch (error) {
                 return
             }
@@ -282,6 +300,27 @@ function removeLoader(event) {
 }
 
 function removeCityFromStorage(cityName) {
+    let url = 'http://localhost:8080/favourites'
+    let params = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'name': cityName })
+    }
+
+    fetch(url, params)
+        .then(handleErrors)
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            console.log(data)
+        })
+        .catch(function(error) {
+            alert(error)
+        })
+
     localStorage.removeItem(cityName)
     let id_ = cityIdMapping[cityName]
     delete idCityMapping[id_]
